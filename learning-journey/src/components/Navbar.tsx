@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import SignInButton from './SignInButton';
 import { getAuthSession } from '@/lib/auth';
+import UserAccount from './UserAccount';
 
 type Props = {}
 
@@ -23,13 +24,22 @@ const Navbar = async (props: Props) => {
         </p>
         </Link>
         <div className='flex items-center'>
-          <Link href="/create" className='mr-3'>
-            Course
-          </Link>
-          <Link href="/settings" className="mr-3">
-            Settings
-          </Link>
-          <SignInButton/>
+            <Link href="/gallery" className="mr-3">
+              Gallery
+            </Link>
+          {session?.user && (
+            <>
+             <Link href="/create" className='mr-3'>
+              Course
+             </Link>
+             <Link href="/settings" className="mr-3">
+              Settings
+             </Link>
+            </>
+          )}
+          <div className='flex items-center'>
+            {session?.user ? <UserAccount user={session.user}/> : <SignInButton/>}
+          </div>
         </div>
     </div>
   </nav>
