@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 import { Button } from './ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import {motion, AnimatePresence} from 'framer-motion'
 
 type Props = {}
@@ -97,11 +97,14 @@ const CreateCourseForms = (props: Props) => {
                         form.setValue('units', form.watch('units').slice(0, -1))
                     }}> 
                         Remove Unit
-                        <Plus className='w-4 h-4 ml-2 text-red-500'/>
+                        <Trash className='w-4 h-4 ml-2 text-red-500'/>
                     </Button>
                 </div>
                 <Separator className='flex-[1]'/>
             </div>
+            <Button type='submit' className='w-full mt-6' size='lg'>
+                Start course
+            </Button>
 
             </form>
         </Form>
