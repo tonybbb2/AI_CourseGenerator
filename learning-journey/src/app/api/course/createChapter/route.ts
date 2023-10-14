@@ -18,7 +18,7 @@ export async function POST(req: Request, res: Response){
                 youtube_search_query : string;
                 chapter_title : string;
             }[];
-        };
+        }[];
 
         let output_units : outputUnits = await strict_output(
             'You are an AI capable of curating course content, coming up with relevant chapter titles, and finding relevant youtube videos for each chapter.', 
@@ -43,9 +43,34 @@ export async function POST(req: Request, res: Response){
             imageSearchTerm.image_search_term
         )
 
-        // const course = await prisma
-    
-        return NextResponse.json([output_units, imageSearchTerm, course_image]);
+        const course = await prisma.course.create({
+            data : {
+                name : title,
+                image : course_image
+            }
+        })
+
+        for (const unit of output_units){
+            const title = unit.title;
+            const prismaUnit = await prisma.unit.create({
+                data : {
+                    name : title,
+                    courseId : course.id
+                }
+            })
+
+            await prisma.chapter.createMany({
+                data : unit.chapters.map((chapter)=>{
+                    return {
+                        name : chapter.chapter_title,
+                        youtubeQuerySearch : chapter.youtube_search_query,
+                        unitId : prismaUnit.id
+                    }
+                })
+            })
+        }
+
+        return NextResponse.json({course_id : course.id});
     } catch (error) {
         if(error instanceof ZodError){
             return new NextResponse("invalid body", {status:400})
