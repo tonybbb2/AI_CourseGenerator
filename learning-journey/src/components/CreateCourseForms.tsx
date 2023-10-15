@@ -10,12 +10,25 @@ import { Separator } from './ui/separator'
 import { Button } from './ui/button'
 import { Plus, Trash } from 'lucide-react'
 import {motion, AnimatePresence} from 'framer-motion'
+import { useMutation } from '@tanstack/react-query'
+import axios from "axios";
+import { useToast } from './ui/use-toast'
+import { useRouter } from 'next/navigation'
 
 type Props = {}
 
 type Input = z.infer<typeof createChaptersSchema>
 
 const CreateCourseForms = (props: Props) => {
+    const router = useRouter();
+    const {toast} = useToast();
+    const {mutate : createChapters, isLoading} = useMutation({
+        mutationFn : async({title, units} : Input) => {
+            const response = await axios.post('/api/course/createChapter', {title, units})
+            return response.data
+
+        }
+    })
 
   const form = useForm<Input>({
     resolver : zodResolver(createChaptersSchema),
@@ -26,7 +39,31 @@ const CreateCourseForms = (props: Props) => {
   })
 
   function onSubmit(data : Input){
-      console.log(data)
+      if(data.units.some(unit=>unit==='')){
+        toast({
+            title : "Error",
+            description : "Please fill all the units",
+            variant : "destructive"
+        });
+        return;
+      }
+      createChapters(data, {
+          onSuccess : ({course_id}) => {
+            toast({
+                title : "success",
+                description : "Course created succesfully!"
+            });
+            router.push(`/creation/${course_id}`)
+          },
+          onError : (error) => {
+            toast({
+                title : "Error",
+                description : "Something went wrong behind the server.",
+                variant : "destructive"
+            });
+            return;
+          }
+      })
   }
 
   console.log(form.watch())
@@ -102,7 +139,7 @@ const CreateCourseForms = (props: Props) => {
                 </div>
                 <Separator className='flex-[1]'/>
             </div>
-            <Button type='submit' className='w-full mt-6' size='lg'>
+            <Button disabled={isLoading} type='submit' className='w-full mt-6' size='lg'>
                 Start course
             </Button>
 
