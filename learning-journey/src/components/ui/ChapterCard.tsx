@@ -4,17 +4,22 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
+import { useToast } from './use-toast'
+import { Loader2 } from 'lucide-react'
 
 type Props = {
-    chapter : Chapter
-    chapterIndex : number
+    chapter : Chapter;
+    chapterIndex : number;
+    completedChapters : Set<String>;
+    setCompletedChapters : React.Dispatch<React.SetStateAction<Set<String>>>
 }
 
 export type ChapterCardHandler = {
     triggerLoad : () => void;
 }
 
-const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapterIndex}, ref) => {
+const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapterIndex, setCompletedChapters, completedChapters}, ref) => {
+    const {toast} = useToast();
     const [success, setSuccess] = React.useState<boolean | null>(null);
     const {mutate : getChapterInfo, isLoading} = useMutation({
         mutationFn : async () => {
@@ -23,11 +28,41 @@ const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapt
         },
     });
 
+    const addChapterIdToBet = React.useCallback(() => {
+        setCompletedChapters((prev) => {
+            const newSet = new Set(prev)
+            newSet.add(chapter.id);
+            return newSet;
+        })
+    }, [completedChapters, chapter.id, setCompletedChapters])
+
+    React.useEffect(() => {
+        if (chapter.videoId){
+            setSuccess(true);
+            addChapterIdToBet;
+        }
+    }, [chapter, addChapterIdToBet])
+
     React.useImperativeHandle(ref, () => ({
         async triggerLoad() {
+            if (chapter.videoId) {
+                addChapterIdToBet();
+                return 
+            }
             getChapterInfo(undefined, {
                 onSuccess : () => {
-                    console.log("success");
+                    setSuccess(true)
+                    addChapterIdToBet();
+                },
+                onError : (error) => {
+                    console.error(error)
+                    setSuccess(false)
+                    toast({
+                        title : "Error",
+                        description : "There was an error loading your chapter.",
+                        variant : "destructive"
+                    });
+                    addChapterIdToBet();
                 }
             })
         }
@@ -44,6 +79,7 @@ const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapt
         <h5>
             {chapter.name}
         </h5>
+        {isLoading && <Loader2 className='animate-spin' />}
     </div>
   )
 }

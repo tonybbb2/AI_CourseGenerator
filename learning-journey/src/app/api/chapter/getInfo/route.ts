@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { strict_output } from "@/lib/gpt";
-import { getTranscript, searchYouTube } from "@/lib/youtube";
+import { getQuestionsFromTranscript, getTranscript, searchYouTube } from "@/lib/youtube";
 import { NextResponse } from "next/server";
 import z from "zod";
 
@@ -32,15 +32,42 @@ export async function POST(req : Request, res : Response){
 
         }
         const videoId = await searchYouTube(chapter.youtubeQuerySearch)
-        const transcript = await getTranscript(videoId)
+        let transcript = await getTranscript(videoId);
+        let maxLength = 250
+        transcript = transcript.split(' ').slice(0, maxLength).join(" ");
 
         const {summary} : {summary : string} = await strict_output(
             'You are an AI capable of summarising a youtube transcript',
             'summarise in 250 words or less and do not talk of the sponsors or anything related to the main topic, also do not introduce what the summary is about. \n'+
             transcript,
             {summary : "summary of the transcript"}
-        )
-        return NextResponse.json({videoId, transcript, summary})
+        );
+
+        const questions = await getQuestionsFromTranscript(transcript, chapter.name);
+         
+        await prisma.question.createMany({
+            data : questions.map(question => {
+                let options = [ question.answer, question.option1, question.option3]
+                options = options.sort(()=> Math.random() - 0.5)
+
+                return {
+                    question : question.question,
+                    answer : question.answer,
+                    options : JSON.stringify(options),
+                    chapterId : chapterId
+                }
+            })
+        })
+
+        await prisma.chapter.update({
+            where : { id : chapterId },
+            data : {
+                videoId : videoId,
+                summary : summary,
+            },
+        })
+
+        return NextResponse.json({success : true})
     } catch (error) {
         if(error instanceof z.ZodError) {
             return NextResponse.json(
@@ -53,6 +80,7 @@ export async function POST(req : Request, res : Response){
                 }
             );
         } else {
+            console.log(error);
             return NextResponse.json(
                 {
                     success : false,
