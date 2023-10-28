@@ -1,12 +1,13 @@
 import CourseSideBar from '@/components/ui/CourseSideBar'
+import MainVideoSummary from '@/components/ui/MainVideoSummary'
 import { prisma } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
 type Props = {
     params : {
-        slug : string[]
-    }
+        slug : string[];
+    };
 }
 
 const CoursePage = async ({params : {slug} }: Props) => {
@@ -15,7 +16,12 @@ const CoursePage = async ({params : {slug} }: Props) => {
       where : {id : courseId},
       include : {
         units : {
-          include : {chapters : true}
+          include : {
+            chapters : {
+              include : {
+                questions : true
+              },
+          }}
         }
       }
     })
@@ -30,9 +36,30 @@ const CoursePage = async ({params : {slug} }: Props) => {
     if(!unit){
       return redirect('/gallery');
     }
-    return (
-      <CourseSideBar course={course}/>
 
+    console.log(unit);
+    
+    const chapter = unit.chapters[chapterIndex];
+    if (!chapter){
+      return redirect('/gallery')
+    }
+
+    return (
+      <div>
+        <CourseSideBar course={course} currentChapterId={chapter.id}/>
+        <div>
+          <div className='ml-[400px] px-8'>
+              <div className='flex'>
+                <MainVideoSummary 
+                  chapter={chapter}
+                  chapterIndex={chapterIndex}
+                  unit={unit}
+                  unitIndex={unitIndex}
+                />
+              </div>
+          </div>
+        </div>
+      </div>
     )
 }
 

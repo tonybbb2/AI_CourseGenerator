@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Youtube } from "lucide-react";
 import { YoutubeTranscript } from 'youtube-transcript';
 import { strict_output } from "./gpt";
 
@@ -23,6 +22,7 @@ export async function searchYouTube(searchQuery: string) {
     }
     return json.items[0].id.videoId;
   }
+   
    
 export async function getTranscript(videoId : string){
     try {

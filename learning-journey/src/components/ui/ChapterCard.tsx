@@ -18,13 +18,14 @@ export type ChapterCardHandler = {
     triggerLoad : () => void;
 }
 
-const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapterIndex, setCompletedChapters, completedChapters}, ref) => {
+const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(
+    ({chapter, chapterIndex, setCompletedChapters, completedChapters}, ref) => {
     const {toast} = useToast();
     const [success, setSuccess] = React.useState<boolean | null>(null);
     const {mutate : getChapterInfo, isLoading} = useMutation({
         mutationFn : async () => {
-            const response = await axios.post('/api/chapter/getInfo', {chapterId : chapter.id})
-            return response.data
+            const response = await axios.post('/api/chapter/getInfo', {chapterId : chapter.id});
+            return response.data;
         },
     });
 
@@ -34,7 +35,7 @@ const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapt
             newSet.add(chapter.id);
             return newSet;
         })
-    }, [completedChapters, chapter.id, setCompletedChapters])
+    }, [chapter.id, setCompletedChapters])
 
     React.useEffect(() => {
         if (chapter.videoId){
@@ -85,4 +86,6 @@ const ChapterCard = React.forwardRef<ChapterCardHandler, Props>(({chapter, chapt
 }
 )
 
-export default ChapterCard
+ChapterCard.displayName = "ChapterCard";
+
+export default ChapterCard;

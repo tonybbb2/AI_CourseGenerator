@@ -46,7 +46,7 @@ export async function POST(req: Request, res: Response){
         const course = await prisma.course.create({
             data : {
                 name : title,
-                image : course_image
+                image : course_image,
             }
         })
 

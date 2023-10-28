@@ -10,7 +10,7 @@ type Props = {
             chapters : Chapter[]
         })[];
     };
-    currentChapterId : string
+    currentChapterId : String
 }
 
 const CourseSideBar = async ({course, currentChapterId}: Props) => {
@@ -26,7 +26,7 @@ const CourseSideBar = async ({course, currentChapterId}: Props) => {
                             return (<div key={chapter.id}>
                                 <Link href={`/course/${course.id}/${unitIndex}/${chapterIndex}`}
                                  className={cn("text-secondary-foreground/60", {
-                                     'text-green-500 font-bold' : chapter.id = currentChapterId
+                                     'text-green-500 font-bold' : chapter.id === currentChapterId
                                  })}   >
                                     {chapter.name}
                                 </Link>
