@@ -20,6 +20,7 @@ export async function searchYouTube(searchQuery: string) {
       console.log("youtube fail");
       return null;
     }
+    console.log(json);
     return json.items[0].id.videoId;
   }
    
