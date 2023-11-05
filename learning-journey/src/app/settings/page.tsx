@@ -1,5 +1,5 @@
 import SubscriptionButton from '@/components/SubscriptionButton'
-import { checkSubscription } from '@/lib/Subscription'
+import { checkSubscription } from '@/lib/subscription'
 import React from 'react'
 
 type Props = {}

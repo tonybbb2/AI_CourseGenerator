@@ -1,5 +1,5 @@
 import CreateCourseForms from '@/components/CreateCourseForms';
-import { checkSubscription } from '@/lib/Subscription';
+import { checkSubscription } from '@/lib/subscription';
 import { getAuthSession } from '@/lib/auth'
 import { InfoIcon } from 'lucide-react';
 import { redirect } from 'next/navigation';
