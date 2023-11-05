@@ -1,4 +1,5 @@
 import CreateCourseForms from '@/components/CreateCourseForms';
+import { checkSubscription } from '@/lib/Subscription';
 import { getAuthSession } from '@/lib/auth'
 import { InfoIcon } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -13,6 +14,8 @@ const CreatePage = async (props: Props) => {
         return redirect('/gallery')
     }
 
+    const isPro = await checkSubscription();
+
     return (
         <div className='flex flex-col items-start max-w-xl px-8 mx-auto my-16 sm:px-0'>
             <h1 className='self-center text-3xl font-bold text-center sm:text-6xl'>
@@ -25,7 +28,7 @@ const CreatePage = async (props: Props) => {
                     Then enter a list of units, which are the specifics you want to learn. 
                 </div>
             </div>
-            <CreateCourseForms/>
+            <CreateCourseForms isPro={isPro}/>
 
         </div>
     )

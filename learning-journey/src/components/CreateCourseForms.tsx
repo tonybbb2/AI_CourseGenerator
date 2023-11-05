@@ -16,11 +16,13 @@ import { useToast } from './ui/use-toast'
 import { useRouter } from 'next/navigation'
 import SubscriptIconAction from './SubscriptIconAction'
 
-type Props = {}
+type Props = {
+    isPro : boolean
+}
 
 type Input = z.infer<typeof createChaptersSchema>
 
-const CreateCourseForms = (props: Props) => {
+const CreateCourseForms = ({isPro}: Props) => {
     const router = useRouter();
     const {toast} = useToast();
     const {mutate : createChapters, isLoading} = useMutation({
@@ -146,7 +148,9 @@ const CreateCourseForms = (props: Props) => {
 
             </form>
         </Form>
-        <SubscriptIconAction />
+        {!isPro && 
+            <SubscriptIconAction />
+        }
     </div>
   )
 }
