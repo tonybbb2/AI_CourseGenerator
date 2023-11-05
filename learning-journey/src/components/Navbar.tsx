@@ -30,7 +30,7 @@ const Navbar = async (props: Props) => {
             </Link>
           {session?.user && (
             <>
-             <Link href="/create" className='mr-3'>
+             <Link href="/creation" className='mr-3'>
               Course
              </Link>
              <Link href="/settings" className="mr-3">

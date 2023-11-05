@@ -8,12 +8,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from './ui/input'
 import { Separator } from './ui/separator'
 import { Button } from './ui/button'
-import { Plus, Trash } from 'lucide-react'
+import { Plus, SubscriptIcon, Trash } from 'lucide-react'
 import {motion, AnimatePresence} from 'framer-motion'
 import { useMutation } from '@tanstack/react-query'
 import axios from "axios";
 import { useToast } from './ui/use-toast'
 import { useRouter } from 'next/navigation'
+import SubscriptIconAction from './SubscriptIconAction'
 
 type Props = {}
 
@@ -145,6 +146,7 @@ const CreateCourseForms = (props: Props) => {
 
             </form>
         </Form>
+        <SubscriptIconAction />
     </div>
   )
 }
